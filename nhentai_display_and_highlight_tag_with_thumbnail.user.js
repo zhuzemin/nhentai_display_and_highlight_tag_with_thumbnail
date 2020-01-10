@@ -7,7 +7,7 @@
 // @include     https://en.nyahentai3.com/*
 // @include     https://zh.nyahentai.co/*
 // @include     https://ja.nyahentai.net/*
-// @version     1.1
+// @version     1.2
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -50,6 +50,13 @@ setUserPref(
     `Set highlights, split with ";". Example: "mmf threesome; chinese"`,
     ','
 );
+setUserPref(
+    'BlackList',
+    'english;',
+    'Set BlackList',
+    `Set BlackList, split with ";". Example: "chinese; yaoi"`,
+    ','
+);
 
 
 CreateStyle=function(){
@@ -87,10 +94,12 @@ class Gallery{
 var init = function () {
     var LastDivNum=0;
     var highlights=[];
+    var BlackList=[];
     try{
         highlights=GM_getValue("highlights").split(";");
+        BlackList=GM_getValue("BlackList").split(";");
     }catch(e){
-        debug("Not set highlights.");
+        debug("Not set GM_Value.");
     }
     CreateStyle();
     setInterval(function(){
@@ -138,17 +147,25 @@ var init = function () {
                                 taglist = galleryHtml.querySelector('#tags');
                                 var links = taglist.querySelectorAll("a.tag");
                                 //debug(taglist);
-                                for (var highlight of highlights) {
-                                    //debug("Highlight: "+highlight);
-                                    if (highlight.length > 1) {
-                                        for (var link of links) {
-                                            //var span=link.querySelector("span.count");
-                                            //link.removeChild(span);
-                                            var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
-                                            //debug("Tag: "+tag);
-                                            if (tag == highlight.trim()) {
-                                                debug("Tag: " + link.innerText);
-                                                link.className += " glowbox";
+                                for (var BlackWord of BlackList) {
+                                    if (BlackWord.length > 1) {
+                                        for (var highlight of highlights) {
+                                            //debug("Highlight: "+highlight);
+                                            if (highlight.length > 1) {
+                                                for (var link of links) {
+                                                    //var span=link.querySelector("span.count");
+                                                    //link.removeChild(span);
+                                                    var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
+                                                    //debug("Tag: "+tag);
+                                                    if (tag == BlackWord.trim()) {
+                                                        div.className +=" blacklisted";
+                                                        return;
+                                                    }
+                                                    else if (tag == highlight.trim()) {
+                                                        debug("Tag: " + link.innerText);
+                                                        link.className += " glowbox";
+                                                    }
+                                                }
                                             }
                                         }
                                     }
