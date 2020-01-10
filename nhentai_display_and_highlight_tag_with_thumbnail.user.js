@@ -7,7 +7,7 @@
 // @include     https://en.nyahentai3.com/*
 // @include     https://zh.nyahentai.co/*
 // @include     https://ja.nyahentai.net/*
-// @version     1.2
+// @version     1.3
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -147,12 +147,12 @@ var init = function () {
                                 taglist = galleryHtml.querySelector('#tags');
                                 var links = taglist.querySelectorAll("a.tag");
                                 //debug(taglist);
+                                                for (var link of links) {
                                 for (var BlackWord of BlackList) {
                                     if (BlackWord.length > 1) {
                                         for (var highlight of highlights) {
                                             //debug("Highlight: "+highlight);
                                             if (highlight.length > 1) {
-                                                for (var link of links) {
                                                     //var span=link.querySelector("span.count");
                                                     //link.removeChild(span);
                                                     var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
