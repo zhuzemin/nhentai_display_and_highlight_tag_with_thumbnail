@@ -4,7 +4,10 @@
 // @supportURL  https://github.com/zhuzemin
 // @description nHentai 显示并高亮Tag在缩略图模式
 // @include     https://nhentai.net/*
-// @version     1.0
+// @include     https://en.nyahentai3.com/*
+// @include     https://zh.nyahentai.co/*
+// @include     https://ja.nyahentai.net/*
+// @version     1.1
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -13,7 +16,6 @@
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
 // @license     CC Attribution-ShareAlike 4.0 International; http://creativecommons.org/licenses/by-sa/4.0/
-// @connect-src nhentai.net
 // ==/UserScript==
 var config = {
     'debug': false
@@ -91,7 +93,7 @@ var init = function () {
         debug("Not set highlights.");
     }
     CreateStyle();
-    //setInterval(function(){
+    setInterval(function(){
         var divs = document.querySelectorAll('div.gallery');
         debug("DivNum: "+divs.length);
         if(LastDivNum<divs.length) {
@@ -101,6 +103,8 @@ var init = function () {
                     div.style.height = "900px";
                     var a = div.querySelector("a");
                     var img = a.querySelector("img");
+                    var data_src=img.getAttribute("data-src");
+                    img.setAttribute("src",data_src);
                     div.insertBefore(img, a);
                     a.style.overflow = "auto";
                     a.style.maxHeight = 900 - img.offsetHeight + "px";
@@ -159,6 +163,6 @@ var init = function () {
         }
         LastDivNum=divs.length;
 
-    //}, 2000)
+    }, 2000)
 }
 window.addEventListener('DOMContentLoaded', init);
