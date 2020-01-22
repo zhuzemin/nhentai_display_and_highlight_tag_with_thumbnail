@@ -7,7 +7,8 @@
 // @include     https://en.nyahentai3.com/*
 // @include     https://zh.nyahentai.co/*
 // @include     https://ja.nyahentai.net/*
-// @version     1.3
+// @include     https://zh.nyahentai.pro/*
+// @version     1.4
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -80,7 +81,7 @@ CreateStyle=function(){
     debug("End: CreateStyle");
 }
 class Gallery{
-    constructor(href) {
+    constructor(href,other=null) {
         this.method = 'GET';
         this.url = href;
         this.headers = {
@@ -89,97 +90,192 @@ class Gallery{
             'Referer': window.location.href,
         };
         this.charset = 'text/plain;charset=utf8';
+        this.other=other;
     }
 }
-var init = function () {
-    var LastDivNum=0;
-    var highlights=[];
-    var BlackList=[];
+var BlackListLast=[];
+var highlightsLast=[];
+var DivCount;
+function HighlightTag(responseDetails,divs){
+    //debug("HighlightTag");
+    var dom;
+    if(responseDetails!=null){
+        var responseText=responseDetails.responseText;
+        dom = new DOMParser().parseFromString(responseText, "text/html");
+
+    }
+    var highlights;
+    var BlackList;
     try{
-        highlights=GM_getValue("highlights").split(";");
-        BlackList=GM_getValue("BlackList").split(";");
+        highlights=GM_getValue("highlights").trim().replace(/;$/,"").split(";");
+        BlackList=GM_getValue("BlackList").trim().replace(/;$/,"").split(";");
     }catch(e){
         debug("Not set GM_Value.");
     }
-    CreateStyle();
-    setInterval(function(){
-        var divs = document.querySelectorAll('div.gallery');
-        debug("DivNum: "+divs.length);
-        if(LastDivNum<divs.length) {
-            for (var i = LastDivNum; i < divs.length; ++i) {
-                (function (div) {
-                    div.style.maxHeight = "900px";
-                    div.style.height = "900px";
-                    var a = div.querySelector("a");
-                    var img = a.querySelector("img");
-                    var data_src=img.getAttribute("data-src");
-                    img.setAttribute("src",data_src);
-                    div.insertBefore(img, a);
-                    a.style.overflow = "auto";
-                    a.style.maxHeight = 900 - img.offsetHeight + "px";
-                    var caption = a.querySelector("div.caption");
-                    caption.style.position = "static";
-                    var taglist = document.createElement("section");
-                    taglist.setAttribute("id", "tags");
-                    a.insertBefore(taglist, null);
-                    var href = div.querySelector('a').href;
-                    debug(href);
-                    var gallery = new Gallery(href);
-                    var retries = 10;
-                    var request = function () {
-                        GM_xmlhttpRequest({
-                            method: gallery.method,
-                            url: gallery.url,
-                            headers: gallery.headers,
-                            overrideMimeType: gallery.charset,
-                            //synchronous: true
-                            onload: function (responseDetails) {
-                                if (responseDetails.status != 200) {
-                                    // retry
-                                    if (retries--) {          // *** Recurse if we still have retries
-                                        setTimeout(request(),2000);
-                                        return;
+    if (BlackList == undefined||BlackList.length ==0) {
+        BlackList = [];
+    }
+    if (highlights == undefined||highlights.length ==0) {
+        highlights = [];
+    }
+    debug("BlackList: " + BlackList);
+    if(responseDetails!=null||JSON.stringify(BlackList)!=JSON.stringify(BlackListLast)||JSON.stringify(highlights)!=JSON.stringify(highlightsLast)){
+
+        var taglist;
+        var NewDivs;
+        if(responseDetails==null){
+            NewDivs = divs;
+        }
+        else{
+            NewDivs=[0];
+        }
+        //debug("NewDivs.length: "+NewDivs.length);
+        for(var i=0;i<NewDivs.length;i++){
+            var Break=false;
+            var div;
+            if(responseDetails!=null){
+                div=divs[DivCount];
+                taglist = dom.querySelector('#tags');
+            }
+            else{
+                div=divs[i];
+                taglist = div.querySelector('#tags');
+
+            }
+            //debug(taglist);
+                var links = taglist.querySelectorAll("a.tag");
+                //debug(links);
+                if(responseDetails!=null||JSON.stringify(BlackList)!=JSON.stringify(BlackListLast)){
+                    for (var link of links) {
+                        var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
+                        //debug("Tag: "+tag);
+                            for (var BlackWord of BlackList) {
+                                if (BlackWord.length > 1) {
+                                    if (tag == BlackWord.trim()) {
+                                        debug("BlackWord: " + link.innerText);
+                                        div.className += " blacklisted";
+                                        Break=true;
+                                        break;
+                                    }
+                                    else if (link==links[links.length-1]&&BlackWord == BlackList[BlackList.length - 1]) {
+                                        div.className = div.className.replace(" blacklisted", "");
                                     }
                                 }
-                                debug(responseDetails);
-                                var galleryHtml = new DOMParser().parseFromString(responseDetails.responseText, "text/html");
-                                //debug(galleryHtml);
-                                taglist = galleryHtml.querySelector('#tags');
-                                var links = taglist.querySelectorAll("a.tag");
-                                //debug(taglist);
-                                                for (var link of links) {
-                                for (var BlackWord of BlackList) {
-                                    if (BlackWord.length > 1) {
-                                        for (var highlight of highlights) {
-                                            //debug("Highlight: "+highlight);
-                                            if (highlight.length > 1) {
-                                                    //var span=link.querySelector("span.count");
-                                                    //link.removeChild(span);
-                                                    var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
-                                                    //debug("Tag: "+tag);
-                                                    if (tag == BlackWord.trim()) {
-                                                        div.className +=" blacklisted";
-                                                        return;
-                                                    }
-                                                    else if (tag == highlight.trim()) {
-                                                        debug("Tag: " + link.innerText);
-                                                        link.className += " glowbox";
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                else{
+                                    div.className = div.className.replace(" blacklisted", "");
+
                                 }
-                                a.replaceChild(taglist, a.querySelector("#tags"));
                             }
-                        });
+                        if (Break) {
+                            break;
+                        }
+                }
+
+            }
+                    if(responseDetails!=null||JSON.stringify(highlights)!=JSON.stringify(highlightsLast)){
+                    for (var link of links) {
+                        var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
+                        //debug("Tag: "+tag);
+                        for (var highlight of highlights) {
+                            if (highlight.length > 1) {
+                                //debug("Highlight: "+highlight);
+                                    if (tag == highlight.trim()) {
+                                        debug("highlight: " + link.innerText);
+                                        link.className += " glowbox";
+                                        break;
+                                    }
+                                    else if (highlight == highlights[highlights.length - 1]) {
+                                        link.className = link.className.replace(" glowbox", "");
+                                    }
+                                }
+                            else{
+                                link.className = link.className.replace(" glowbox", "");
+
+                            }
+                            }
+                        }
+
                     }
-                    request();
-                })(divs[i]);
+
+            if(responseDetails!=null) {
+                var a = div.querySelector("a");
+                a.replaceChild(taglist, a.querySelector("#tags"));
+                DivCount++;
+            }
+                }
+        if(responseDetails!=null) {
+
+            if (DivCount < divs.length) {
+                MainWoker(divs);
             }
         }
-        LastDivNum=divs.length;
+        debug("BlackListLast: "+BlackListLast);
+        debug("highlightsLast: "+highlightsLast);
+        highlightsLast=highlights;
+        BlackListLast=BlackList;
+            }
 
+        }
+
+        function MainWoker(divs){
+    debug("MainWoker");
+            var div=divs[DivCount];
+            div.style.maxHeight = "900px";
+            div.style.height = "900px";
+            var a = div.querySelector("a");
+            var img = a.querySelector("img");
+            var data_src=img.getAttribute("data-src");
+            img.setAttribute("src",data_src);
+            div.insertBefore(img, a);
+            a.style.overflow = "auto";
+            a.style.maxHeight = 900 - img.offsetHeight + "px";
+            var caption = a.querySelector("div.caption");
+            caption.style.position = "static";
+            var taglist = document.createElement("section");
+            taglist.setAttribute("id", "tags");
+            a.insertBefore(taglist, null);
+            var href = div.querySelector('a').href;
+            //debug(href);
+            var gallery = new Gallery(href);
+            gallery.other=divs;
+            request(gallery,HighlightTag);
+
+        }
+var init = function () {
+    var LastDivNum=0;
+    CreateStyle();
+    DivCount=0;
+    setInterval(function(){
+        var divs = document.querySelectorAll('div.gallery');
+        //debug("DivNum: "+divs.length);
+        if(LastDivNum<divs.length) {
+            MainWoker(divs);
+        }
+        LastDivNum=divs.length;
+            HighlightTag(null,divs);
     }, 2000)
 }
+function request(object,func) {
+    var retries = 10;
+    GM_xmlhttpRequest({
+        method: object.method,
+        url: object.url,
+        headers: object.headers,
+        overrideMimeType: object.charset,
+        //synchronous: true
+        onload: function (responseDetails) {
+            if (responseDetails.status != 200) {
+                // retry
+                if (retries--) {          // *** Recurse if we still have retries
+                    setTimeout(request,2000);
+                    return;
+                }
+            }
+            //debug(responseDetails);
+            //Dowork
+            func(responseDetails,object.other);
+        }
+    })
+}
+
 window.addEventListener('DOMContentLoaded', init);
