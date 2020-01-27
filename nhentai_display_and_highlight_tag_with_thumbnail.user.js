@@ -8,7 +8,7 @@
 // @include     https://zh.nyahentai.co/*
 // @include     https://ja.nyahentai.net/*
 // @include     https://zh.nyahentai.pro/*
-// @version     1.4
+// @version     1.5
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -245,10 +245,13 @@ var init = function () {
     var LastDivNum=0;
     CreateStyle();
     DivCount=0;
+    var html = document.querySelector('html');
     setInterval(function(){
-        var divs = document.querySelectorAll('div.gallery');
+        var divs = html.querySelectorAll('div.gallery');
         //debug("DivNum: "+divs.length);
         if(LastDivNum<divs.length) {
+            html.style.height=divs.length/5*900+"px";
+            debug("html.style.height: "+html.style.height);
             MainWoker(divs);
         }
         LastDivNum=divs.length;
