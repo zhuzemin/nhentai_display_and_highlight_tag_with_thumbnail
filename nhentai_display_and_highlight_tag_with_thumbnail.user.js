@@ -1,14 +1,22 @@
 // ==UserScript==
-// @name        nhentai Display and Highlight Tag with Thumbnail
+// @name        nhentai show Tag in search page
+// @name:ja        nhentai show Tag in search page
+// @name:zh-TW         nhentai show Tag in search page
+// @name:zh-CN        nhentai show Tag in search page
 // @namespace   nhentai_display_and_highlight_tag_with_thumbnail
 // @supportURL  https://github.com/zhuzemin
-// @description nHentai 显示并高亮Tag在缩略图模式
+// @description nhentai show Tag in search page, and highlight block function
+// @description:zh-CN nhentai show Tag in search page, and highlight block function
+// @description:zh-TW  nhentai show Tag in search page, and highlight block function
+// @description:ja nhentai show Tag in search page, and highlight block function
 // @include     https://nhentai.net/*
 // @include     https://en.nyahentai3.com/*
 // @include     https://zh.nyahentai.co/*
 // @include     https://ja.nyahentai.net/*
 // @include     https://zh.nyahentai.pro/*
-// @version     1.6
+// @include     https://ja.nyahentai.org/g/*
+// @include     https://zh.nyahentai4.com/g/*
+// @version     1.5
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -17,11 +25,6 @@
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
 // @license     CC Attribution-ShareAlike 4.0 International; http://creativecommons.org/licenses/by-sa/4.0/
-// @connect-src nhentai.net
-// @connect-src en.nyahentai3.com
-// @connect-src zh.nyahentai.co
-// @connect-src ja.nyahentai.net
-// @connect-src zh.nyahentai.pro
 // ==/UserScript==
 var config = {
     'debug': false
