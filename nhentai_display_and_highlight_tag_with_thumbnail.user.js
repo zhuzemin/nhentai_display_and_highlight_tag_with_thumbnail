@@ -16,7 +16,7 @@
 // @include     https://zh.nyahentai.pro/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.5
+// @version     1.51
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -25,6 +25,13 @@
 // @author      zhuzemin
 // @license     Mozilla Public License 2.0; http://www.mozilla.org/MPL/2.0/
 // @license     CC Attribution-ShareAlike 4.0 International; http://creativecommons.org/licenses/by-sa/4.0/
+// @connect-src zh.nyahentai4.com
+// @connect-src ja.nyahentai.org
+// @connect-src zh.nyahentai.pro
+// @connect-src ja.nyahentai.net
+// @connect-src zh.nyahentai.co
+// @connect-src en.nyahentai3.com
+// @connect-src nhentai.net
 // ==/UserScript==
 var config = {
     'debug': false
