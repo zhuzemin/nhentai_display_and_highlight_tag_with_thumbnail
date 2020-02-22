@@ -1,14 +1,14 @@
 // ==UserScript==
-// @name        nhentai show Tag in search page
-// @name:ja        nhentai show Tag in search page
-// @name:zh-TW         nhentai show Tag in search page
-// @name:zh-CN        nhentai show Tag in search page
+// @name        nhentai show Tag in main page
+// @name:ja        nhentai show Tag in main page
+// @name:zh-TW         nhentai show Tag in main page
+// @name:zh-CN        nhentai show Tag in main page
 // @namespace   nhentai_display_and_highlight_tag_with_thumbnail
 // @supportURL  https://github.com/zhuzemin
-// @description nhentai show Tag in search page, and highlight block function
-// @description:zh-CN nhentai show Tag in search page, and highlight block function
-// @description:zh-TW  nhentai show Tag in search page, and highlight block function
-// @description:ja nhentai show Tag in search page, and highlight block function
+// @description nhentai show Tag in main page, and highlight/block tag
+// @description:zh-CN nhentai show Tag in main page, and highlight/block tag
+// @description:zh-TW  nhentai show Tag in main page, and highlight/block tag
+// @description:ja nhentai show Tag in main page, and highlight/block tag
 // @include     https://nhentai.net/*
 // @include     https://en.nyahentai3.com/*
 // @include     https://zh.nyahentai.co/*
