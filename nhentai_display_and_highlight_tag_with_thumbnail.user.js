@@ -16,7 +16,7 @@
 // @include     https://zh.nyahentai.pro/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.51
+// @version     1.52
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -32,6 +32,7 @@
 // @connect-src zh.nyahentai.co
 // @connect-src en.nyahentai3.com
 // @connect-src nhentai.net
+// @connect-src nyahentai.org
 // ==/UserScript==
 var config = {
     'debug': false
