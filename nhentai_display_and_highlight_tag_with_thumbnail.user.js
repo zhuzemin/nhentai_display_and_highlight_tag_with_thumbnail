@@ -16,7 +16,13 @@
 // @include     https://zh.nyahentai.pro/*
 // @include     https://ja.nyahentai.org/g/*
 // @include     https://zh.nyahentai4.com/g/*
-// @version     1.52
+// @include     https://zh.bughentai.com/g/*
+// @include     https://zh.bughentai.com/*
+// @include     https://nyahentai.club/g/*
+// @include     https://nyahentai.club/*
+// @include     https://ja.cathentai.com/g/*
+// @include     https://ja.cathentai.com/*
+// @version     1.53
 // @grant       GM_xmlhttpRequest
 // @grant         GM_registerMenuCommand
 // @grant         GM_setValue
@@ -152,6 +158,7 @@ function HighlightTag(responseDetails,divs){
             if(responseDetails!=null){
                 div=divs[DivCount];
                 taglist = dom.querySelector('#tags');
+
             }
             else{
                 div=divs[i];
@@ -159,66 +166,71 @@ function HighlightTag(responseDetails,divs){
 
             }
             //debug(taglist);
-                var links = taglist.querySelectorAll("a.tag");
-                //debug(links);
-                if(responseDetails!=null||JSON.stringify(BlackList)!=JSON.stringify(BlackListLast)){
-                    for (var link of links) {
-                        var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
-                        //debug("Tag: "+tag);
-                            for (var BlackWord of BlackList) {
-                                if (BlackWord.length > 1) {
-                                    if (tag == BlackWord.trim()) {
-                                        debug("BlackWord: " + link.innerText);
-                                        div.className += " blacklisted";
-                                        Break=true;
-                                        break;
-                                    }
-                                    else if (link==links[links.length-1]&&BlackWord == BlackList[BlackList.length - 1]) {
-                                        div.className = div.className.replace(" blacklisted", "");
-                                    }
-                                }
-                                else{
-                                    div.className = div.className.replace(" blacklisted", "");
-
-                                }
+            var links = taglist.querySelectorAll("a.tag");
+            //debug(links);
+            if(responseDetails!=null||JSON.stringify(BlackList)!=JSON.stringify(BlackListLast)){
+                for (var link of links) {
+                    var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
+                    //debug("Tag: "+tag);
+                    for (var BlackWord of BlackList) {
+                        if (BlackWord.length > 1) {
+                            if (tag == BlackWord.trim()) {
+                                debug("BlackWord: " + link.innerText);
+                                div.className += " blacklisted";
+                                Break=true;
+                                break;
                             }
-                        if (Break) {
-                            break;
+                            else if (link==links[links.length-1]&&BlackWord == BlackList[BlackList.length - 1]) {
+                                div.className = div.className.replace(" blacklisted", "");
+                            }
                         }
+                        else{
+                            div.className = div.className.replace(" blacklisted", "");
+
+                        }
+                    }
+                    if (Break) {
+                        break;
+                    }
                 }
 
             }
-                    if(responseDetails!=null||JSON.stringify(highlights)!=JSON.stringify(highlightsLast)){
-                    for (var link of links) {
-                        var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
-                        //debug("Tag: "+tag);
-                        for (var highlight of highlights) {
-                            if (highlight.length > 1) {
-                                //debug("Highlight: "+highlight);
-                                    if (tag == highlight.trim()) {
-                                        debug("highlight: " + link.innerText);
-                                        link.className += " glowbox";
-                                        break;
-                                    }
-                                    else if (highlight == highlights[highlights.length - 1]) {
-                                        link.className = link.className.replace(" glowbox", "");
-                                    }
-                                }
-                            else{
-                                link.className = link.className.replace(" glowbox", "");
-
+            if(responseDetails!=null||JSON.stringify(highlights)!=JSON.stringify(highlightsLast)){
+                for (var link of links) {
+                    var tag = link.innerText.toLowerCase().match(/([\w\s]*)/)[1].trim();
+                    //debug("Tag: "+tag);
+                    for (var highlight of highlights) {
+                        if (highlight.length > 1) {
+                            //debug("Highlight: "+highlight);
+                            if (tag == highlight.trim()) {
+                                debug("highlight: " + link.innerText);
+                                link.className += " glowbox";
+                                break;
                             }
+                            else if (highlight == highlights[highlights.length - 1]) {
+                                link.className = link.className.replace(" glowbox", "");
                             }
                         }
+                        else{
+                            link.className = link.className.replace(" glowbox", "");
 
+                        }
                     }
+                }
+
+            }
 
             if(responseDetails!=null) {
                 var a = div.querySelector("a");
                 a.replaceChild(taglist, a.querySelector("#tags"));
+                let favorite=dom.querySelector('a.btn.btn-primary.btn-disabled.tooltip');
+                if(favorite!=null){
+                    a.insertBefore(favorite,a.lastChild);
+
+                }
                 DivCount++;
             }
-                }
+        }
         if(responseDetails!=null) {
 
             if (DivCount < divs.length) {
@@ -229,34 +241,34 @@ function HighlightTag(responseDetails,divs){
         debug("highlightsLast: "+highlightsLast);
         highlightsLast=highlights;
         BlackListLast=BlackList;
-            }
+    }
 
-        }
+}
 
-        function MainWoker(divs){
+function MainWoker(divs){
     debug("MainWoker");
-            var div=divs[DivCount];
-            div.style.maxHeight = "900px";
-            div.style.height = "900px";
-            var a = div.querySelector("a");
-            var img = a.querySelector("img");
-            var data_src=img.getAttribute("data-src");
-            img.setAttribute("src",data_src);
-            div.insertBefore(img, a);
-            a.style.overflow = "auto";
-            a.style.maxHeight = 900 - img.offsetHeight + "px";
-            var caption = a.querySelector("div.caption");
-            caption.style.position = "static";
-            var taglist = document.createElement("section");
-            taglist.setAttribute("id", "tags");
-            a.insertBefore(taglist, null);
-            var href = div.querySelector('a').href;
-            //debug(href);
-            var gallery = new Gallery(href);
-            gallery.other=divs;
-            request(gallery,HighlightTag);
+    var div=divs[DivCount];
+    div.style.maxHeight = "900px";
+    div.style.height = "900px";
+    var a = div.querySelector("a");
+    var img = a.querySelector("img");
+    var data_src=img.getAttribute("data-src");
+    img.setAttribute("src",data_src);
+    div.insertBefore(img, a);
+    a.style.overflow = "auto";
+    a.style.maxHeight = 900 - img.offsetHeight + "px";
+    var caption = a.querySelector("div.caption");
+    caption.style.position = "static";
+    var taglist = document.createElement("section");
+    taglist.setAttribute("id", "tags");
+    a.insertBefore(taglist, null);
+    var href = div.querySelector('a').href;
+    //debug(href);
+    var gallery = new Gallery(href);
+    gallery.other=divs;
+    request(gallery,HighlightTag);
 
-        }
+}
 var init = function () {
     var LastDivNum=0;
     CreateStyle();
@@ -271,7 +283,7 @@ var init = function () {
             MainWoker(divs);
         }
         LastDivNum=divs.length;
-            HighlightTag(null,divs);
+        HighlightTag(null,divs);
     }, 2000)
 }
 function request(object,func) {
